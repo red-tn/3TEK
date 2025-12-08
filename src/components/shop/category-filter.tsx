@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -10,7 +11,7 @@ interface CategoryFilterProps {
   showAll?: boolean
 }
 
-export function CategoryFilter({ categories, showAll = true }: CategoryFilterProps) {
+function CategoryFilterContent({ categories, showAll = true }: CategoryFilterProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const currentCategory = searchParams.get('category')
@@ -52,5 +53,13 @@ export function CategoryFilter({ categories, showAll = true }: CategoryFilterPro
         )
       })}
     </div>
+  )
+}
+
+export function CategoryFilter(props: CategoryFilterProps) {
+  return (
+    <Suspense fallback={<div className="flex flex-wrap gap-2"><div className="h-10 w-20 bg-brand-gray animate-pulse clip-corners-sm" /></div>}>
+      <CategoryFilterContent {...props} />
+    </Suspense>
   )
 }

@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useCart } from '@/hooks/use-cart'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, Package, ArrowRight } from 'lucide-react'
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const { clearCart } = useCart()
@@ -107,5 +107,13 @@ export default function CheckoutSuccessPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-20 text-center">Loading...</div>}>
+      <CheckoutSuccessContent />
+    </Suspense>
   )
 }

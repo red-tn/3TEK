@@ -9,7 +9,7 @@ export default async function HomePage() {
   const supabase = await createClient()
 
   // Fetch featured products
-  const { data: featuredProducts } = await supabase
+  const { data: featuredProductsData } = await supabase
     .from('products')
     .select('*, category:categories(*)')
     .eq('is_active', true)
@@ -17,12 +17,31 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
     .limit(6)
 
+  const featuredProducts = featuredProductsData as Array<{
+    id: string
+    name: string
+    slug: string
+    price_cents: number
+    compare_at_price_cents: number | null
+    images: Array<{ url: string; alt?: string; is_primary?: boolean }> | null
+    badge: string | null
+    category: { name: string } | null
+  }> | null
+
   // Fetch categories
-  const { data: categories } = await supabase
+  const { data: categoriesData } = await supabase
     .from('categories')
     .select('*')
     .eq('is_active', true)
     .order('display_order')
+
+  const categories = categoriesData as Array<{
+    id: string
+    name: string
+    slug: string
+    description: string | null
+    image_url: string | null
+  }> | null
 
   return (
     <div className="noise-overlay">

@@ -18,12 +18,14 @@ export async function generateMetadata({
   const { slug } = await params
   const supabase = await createClient()
 
-  const { data: category } = await supabase
+  const { data } = await supabase
     .from('categories')
     .select('name, description')
     .eq('slug', slug)
     .eq('is_active', true)
     .single()
+
+  const category = data as { name: string; description: string | null } | null
 
   if (!category) {
     return {
@@ -42,12 +44,14 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const supabase = await createClient()
 
   // Fetch category
-  const { data: category } = await supabase
+  const { data: categoryData } = await supabase
     .from('categories')
     .select('*')
     .eq('slug', slug)
     .eq('is_active', true)
     .single()
+
+  const category = categoryData as { id: string; name: string; description: string | null } | null
 
   if (!category) {
     notFound()

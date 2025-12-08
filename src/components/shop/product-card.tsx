@@ -3,10 +3,20 @@ import Link from 'next/link'
 import { cn, formatPrice } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { AddToCartButton } from './add-to-cart-button'
-import type { Product, Category } from '@/types/database'
+
+interface ProductCardProduct {
+  id: string
+  name: string
+  slug: string
+  price_cents: number
+  compare_at_price_cents?: number | null
+  images?: Array<{ url: string; alt?: string; is_primary?: boolean }> | null
+  badge?: string | null
+  category?: { name: string } | null
+}
 
 interface ProductCardProps {
-  product: Product & { category?: Category | null }
+  product: ProductCardProduct
   className?: string
 }
 
