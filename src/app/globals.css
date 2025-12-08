@@ -1,0 +1,301 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Brand Colors */
+  --color-brand-black: #0a0a0a;
+  --color-brand-dark: #141414;
+  --color-brand-darker: #1a1a1a;
+  --color-brand-gray: #2a2a2a;
+  --color-brand-light-gray: #888888;
+  --color-brand-white: #f0f0f0;
+  --color-brand-neon: #39ff14;
+  --color-brand-neon-dim: #2ecc0f;
+  --color-brand-rust: #c45c26;
+
+  /* Background & Foreground */
+  --color-background: var(--color-brand-black);
+  --color-foreground: var(--color-brand-white);
+
+  /* Font families */
+  --font-display: "Bebas Neue", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-body: "Space Grotesk", sans-serif;
+
+  /* Animations */
+  --animate-fade-up: fadeUp 0.5s ease-out forwards;
+  --animate-glitch: glitch 0.3s ease-in-out;
+  --animate-pulse-neon: pulseNeon 2s ease-in-out infinite;
+  --animate-scanline: scanline 8s linear infinite;
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glitch {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+}
+
+@keyframes pulseNeon {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(57, 255, 20, 0.4), 0 0 10px rgba(57, 255, 20, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.6), 0 0 20px rgba(57, 255, 20, 0.4);
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-brand-black);
+  color: var(--color-brand-white);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selection colors */
+::selection {
+  background: var(--color-brand-neon);
+  color: var(--color-brand-black);
+}
+
+::-moz-selection {
+  background: var(--color-brand-neon);
+  color: var(--color-brand-black);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-brand-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-gray);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-neon);
+}
+
+/* Cut corners utility */
+.clip-corners {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 16px) 0,
+    100% 16px,
+    100% 100%,
+    16px 100%,
+    0 calc(100% - 16px)
+  );
+}
+
+.clip-corners-sm {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
+}
+
+.clip-corners-lg {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 24px) 0,
+    100% 24px,
+    100% 100%,
+    24px 100%,
+    0 calc(100% - 24px)
+  );
+}
+
+/* Noise texture overlay */
+.noise-overlay {
+  position: relative;
+}
+
+.noise-overlay::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Scanline effect */
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanlines::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.1) 0px,
+    rgba(0, 0, 0, 0.1) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Neon text glow */
+.text-neon-glow {
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.6), 0 0 20px rgba(57, 255, 20, 0.4),
+    0 0 30px rgba(57, 255, 20, 0.2);
+}
+
+/* Neon border glow */
+.border-neon-glow {
+  box-shadow: 0 0 5px rgba(57, 255, 20, 0.4), 0 0 10px rgba(57, 255, 20, 0.2);
+}
+
+/* Rust text glow */
+.text-rust-glow {
+  text-shadow: 0 0 10px rgba(196, 92, 38, 0.6), 0 0 20px rgba(196, 92, 38, 0.4);
+}
+
+/* Focus styles */
+.focus-neon:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-brand-neon);
+}
+
+.focus-neon:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-brand-neon), 0 0 10px rgba(57, 255, 20, 0.4);
+}
+
+/* Button base styles */
+.btn-neon {
+  background: transparent;
+  border: 2px solid var(--color-brand-neon);
+  color: var(--color-brand-neon);
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-neon:hover {
+  background: var(--color-brand-neon);
+  color: var(--color-brand-black);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+}
+
+.btn-neon-filled {
+  background: var(--color-brand-neon);
+  border: 2px solid var(--color-brand-neon);
+  color: var(--color-brand-black);
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-neon-filled:hover {
+  background: transparent;
+  color: var(--color-brand-neon);
+  box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+}
+
+/* Card hover effect */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-brand-neon);
+}
+
+/* Grid pattern background */
+.grid-pattern {
+  background-image: linear-gradient(
+      rgba(57, 255, 20, 0.03) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Font utility classes */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
