@@ -60,7 +60,7 @@ const faqs = [
         a: "Yes, we accept STL, OBJ, and 3MF files. We'll review your file for printability and provide a quote. Design modifications may be suggested for optimal print quality.",
       },
       {
-        q: 'What's the turnaround time for custom orders?',
+        q: "What's the turnaround time for custom orders?",
         a: "Custom orders typically take 7-14 business days depending on complexity. Rush orders are available for an additional fee.",
       },
       {
