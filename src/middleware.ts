@@ -53,14 +53,14 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl)
     }
 
-    // Check admin role
+    // Check admin status
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('is_admin')
       .eq('id', user.id)
       .single()
 
-    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    if (!profile || !profile.is_admin) {
       return NextResponse.redirect(new URL('/', request.url))
     }
   }
