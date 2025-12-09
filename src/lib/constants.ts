@@ -43,10 +43,8 @@ export const TAX_RATE = 0.0825
 
 export const NAV_LINKS = [
   { label: 'Shop', href: '/products' },
-  { label: 'Functional', href: '/category/functional' },
-  { label: 'Creative', href: '/category/creative' },
-  { label: 'Tech', href: '/category/tech' },
-  { label: 'Art', href: '/category/art' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
 ] as const
 
 export const ADMIN_NAV_LINKS = [
