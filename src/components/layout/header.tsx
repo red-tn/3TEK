@@ -37,6 +37,15 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Admin Link */}
+            {isAdmin && (
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/admin" title="Admin Dashboard">
+                  <LayoutDashboard className="h-5 w-5 text-brand-neon" />
+                </Link>
+              </Button>
+            )}
+
             {/* Cart */}
             <Button
               variant="ghost"
