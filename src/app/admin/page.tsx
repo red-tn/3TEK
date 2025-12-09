@@ -23,7 +23,7 @@ export default async function AdminDashboardPage() {
   const [ordersResult, productsResult, customersResult] = await Promise.all([
     supabase.from('orders').select('total_cents, status, created_at'),
     supabase.from('products').select('id', { count: 'exact', head: true }),
-    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'customer'),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('is_admin', false),
   ])
 
   const orders = ordersResult.data || []

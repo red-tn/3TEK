@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { ProductGrid } from '@/components/shop/product-grid'
 import { CategoryFilter } from '@/components/shop/category-filter'
+import { SortSelect } from '@/components/shop/sort-select'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { Metadata } from 'next'
 
@@ -113,15 +114,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           <span className="font-mono text-xs text-brand-light-gray uppercase tracking-wider">
             Sort by:
           </span>
-          <select
-            className="bg-brand-darker border border-brand-gray px-3 py-2 font-mono text-sm text-brand-white focus:outline-none focus:border-brand-neon"
-            defaultValue={params.sort || 'newest'}
-          >
-            <option value="newest">Newest</option>
-            <option value="price-asc">Price: Low to High</option>
-            <option value="price-desc">Price: High to Low</option>
-            <option value="name">Name</option>
-          </select>
+          <Suspense fallback={<div className="h-10 w-32 bg-brand-gray animate-pulse" />}>
+            <SortSelect defaultValue={params.sort || 'newest'} />
+          </Suspense>
         </div>
       </div>
 

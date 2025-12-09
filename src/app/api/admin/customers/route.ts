@@ -17,18 +17,18 @@ export async function GET(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('is_admin')
     .eq('id', user.id)
     .single()
 
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !profile.is_admin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   let query = supabase
     .from('profiles')
     .select('*, orders(count)')
-    .eq('role', 'customer')
+    .eq('is_admin', false)
     .order('created_at', { ascending: false })
 
   if (search) {

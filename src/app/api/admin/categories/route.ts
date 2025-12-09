@@ -31,11 +31,11 @@ export async function POST(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('is_admin')
     .eq('id', user.id)
     .single()
 
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !profile.is_admin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -97,11 +97,11 @@ export async function PUT(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('is_admin')
     .eq('id', user.id)
     .single()
 
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !profile.is_admin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -157,11 +157,11 @@ export async function DELETE(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('is_admin')
     .eq('id', user.id)
     .single()
 
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !profile.is_admin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

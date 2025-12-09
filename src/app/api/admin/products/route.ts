@@ -16,11 +16,11 @@ async function checkAdminAuth() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('is_admin')
     .eq('id', user.id)
     .single()
 
-  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+  if (!profile || !profile.is_admin) {
     return { error: 'Forbidden', status: 403 }
   }
 
