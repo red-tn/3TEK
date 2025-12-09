@@ -69,7 +69,7 @@ export function useAuth(): UseAuthReturn {
     setProfile(null)
   }
 
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin'
+  const isAdmin = profile?.is_admin === true
 
   return {
     user,
