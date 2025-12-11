@@ -20,7 +20,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ORDER_STATUSES } from '@/lib/constants'
-import { ArrowLeft, Package, Save, Truck } from 'lucide-react'
+import { ArrowLeft, Package, Save, Truck, FileText } from 'lucide-react'
+import { RefundButton } from '@/components/admin/refund-button'
+import { CreateLabelButton } from '@/components/admin/create-label-button'
 import type { Order, OrderItem, Profile } from '@/types/database'
 
 type OrderWithRelations = Order & {
@@ -153,31 +155,53 @@ export default function AdminOrderDetailPage() {
               Placed on {formatDateTime(order.created_at)}
             </p>
           </div>
-          <div className="flex gap-2">
-            <Badge
-              variant={
-                order.status === 'delivered'
-                  ? 'success'
-                  : order.status === 'shipped'
-                  ? 'default'
-                  : order.status === 'cancelled' || order.status === 'refunded'
-                  ? 'destructive'
-                  : 'secondary'
-              }
+          <div className="flex items-center gap-4">
+            <div className="flex gap-2">
+              <Badge
+                variant={
+                  order.status === 'delivered'
+                    ? 'success'
+                    : order.status === 'shipped'
+                    ? 'default'
+                    : order.status === 'cancelled' || order.status === 'refunded'
+                    ? 'destructive'
+                    : 'secondary'
+                }
+              >
+                {order.status.replace('_', ' ')}
+              </Badge>
+              <Badge
+                variant={
+                  order.payment_status === 'paid'
+                    ? 'success'
+                    : order.payment_status === 'failed'
+                    ? 'destructive'
+                    : 'warning'
+                }
+              >
+                {order.payment_status}
+              </Badge>
+            </div>
+            <RefundButton
+              orderId={order.id}
+              orderNumber={order.order_number}
+              totalCents={order.total_cents}
+              paymentStatus={order.payment_status}
+              onRefundComplete={fetchOrder}
+            />
+            <CreateLabelButton
+              orderId={order.id}
+              orderNumber={order.order_number}
+              hasTrackingNumber={!!order.tracking_number}
+              onLabelCreated={fetchOrder}
+            />
+            <Button
+              variant="outline"
+              onClick={() => window.open(`/api/admin/orders/invoice?orderId=${order.id}`, '_blank')}
             >
-              {order.status.replace('_', ' ')}
-            </Badge>
-            <Badge
-              variant={
-                order.payment_status === 'paid'
-                  ? 'success'
-                  : order.payment_status === 'failed'
-                  ? 'destructive'
-                  : 'warning'
-              }
-            >
-              {order.payment_status}
-            </Badge>
+              <FileText className="mr-2 h-4 w-4" />
+              Invoice
+            </Button>
           </div>
         </div>
       </div>
@@ -218,12 +242,12 @@ export default function AdminOrderDetailPage() {
                       </p>
                     )}
                     <p className="text-sm text-brand-light-gray mt-1">
-                      Qty: {item.quantity} × {formatPrice(item.unit_price_cents)}
+                      Qty: {item.quantity} × {formatPrice(item.price_cents)}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-mono text-brand-neon">
-                      {formatPrice(item.total_cents)}
+                      {formatPrice(item.price_cents * item.quantity)}
                     </p>
                   </div>
                 </div>

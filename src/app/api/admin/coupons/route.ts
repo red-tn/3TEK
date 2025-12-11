@@ -62,11 +62,9 @@ export async function POST(request: NextRequest) {
         description: body.description || null,
         discount_type: body.discountType,
         discount_value: body.discountValue,
-        min_purchase_cents: body.minPurchaseCents || null,
-        max_discount_cents: body.maxDiscountCents || null,
-        usage_limit: body.usageLimit || null,
-        usage_count: 0,
-        starts_at: body.startsAt || null,
+        min_order_cents: body.minOrderCents || 0,
+        max_uses: body.maxUses || null,
+        current_uses: 0,
         expires_at: body.expiresAt || null,
         is_active: body.isActive ?? true,
       })
@@ -140,13 +138,10 @@ export async function PUT(request: NextRequest) {
         description: body.description || null,
         discount_type: body.discountType,
         discount_value: body.discountValue,
-        min_purchase_cents: body.minPurchaseCents || null,
-        max_discount_cents: body.maxDiscountCents || null,
-        usage_limit: body.usageLimit || null,
-        starts_at: body.startsAt || null,
+        min_order_cents: body.minOrderCents || 0,
+        max_uses: body.maxUses || null,
         expires_at: body.expiresAt || null,
         is_active: body.isActive,
-        updated_at: new Date().toISOString(),
       })
       .eq('id', id)
       .select()

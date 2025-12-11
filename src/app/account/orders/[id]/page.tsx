@@ -145,10 +145,10 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
                     )}
                     <div className="flex items-center justify-between mt-2">
                       <p className="text-sm text-brand-light-gray">
-                        Qty: {item.quantity} × {formatPrice(item.unit_price_cents)}
+                        Qty: {item.quantity} × {formatPrice(item.price_cents)}
                       </p>
                       <p className="font-mono text-brand-neon">
-                        {formatPrice(item.total_cents)}
+                        {formatPrice(item.price_cents * item.quantity)}
                       </p>
                     </div>
                   </div>

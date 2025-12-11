@@ -83,7 +83,7 @@ export default function AdminShippingPage() {
       setFormData({
         name: rate.name,
         description: rate.description || '',
-        rateCents: String(rate.rate_cents / 100),
+        rateCents: String(rate.price_cents / 100),
         minOrderCents: rate.min_order_cents ? String(rate.min_order_cents / 100) : '',
         maxOrderCents: rate.max_order_cents ? String(rate.max_order_cents / 100) : '',
         estimatedDaysMin: rate.estimated_days_min ? String(rate.estimated_days_min) : '',
@@ -370,7 +370,7 @@ export default function AdminShippingPage() {
                   </TableCell>
                   <TableCell>
                     <span className="font-mono text-brand-neon">
-                      {rate.rate_cents === 0 ? 'FREE' : formatPrice(rate.rate_cents)}
+                      {rate.price_cents === 0 ? 'FREE' : formatPrice(rate.price_cents)}
                     </span>
                   </TableCell>
                   <TableCell>

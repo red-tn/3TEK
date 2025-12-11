@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       .insert({
         name: body.name,
         description: body.description || null,
-        rate_cents: body.rateCents,
+        price_cents: body.rateCents,
         min_order_cents: body.minOrderCents || 0,
         max_order_cents: body.maxOrderCents || null,
         estimated_days_min: body.estimatedDaysMin || null,
@@ -106,7 +106,7 @@ export async function PUT(request: NextRequest) {
       .update({
         name: body.name,
         description: body.description || null,
-        rate_cents: body.rateCents,
+        price_cents: body.rateCents,
         min_order_cents: body.minOrderCents || 0,
         max_order_cents: body.maxOrderCents || null,
         estimated_days_min: body.estimatedDaysMin || null,

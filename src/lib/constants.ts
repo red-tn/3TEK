@@ -55,5 +55,6 @@ export const ADMIN_NAV_LINKS = [
   { label: 'Customers', href: '/admin/customers', icon: 'Users' },
   { label: 'Shipping', href: '/admin/shipping', icon: 'Truck' },
   { label: 'Coupons', href: '/admin/coupons', icon: 'Tag' },
+  { label: 'Reports', href: '/admin/reports', icon: 'BarChart3' },
   { label: 'Settings', href: '/admin/settings', icon: 'Settings' },
 ] as const

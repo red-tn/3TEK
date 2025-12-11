@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { sendOrderConfirmationEmail } from '@/lib/email'
 import Stripe from 'stripe'
 
 export async function POST(req: Request) {
@@ -36,20 +37,21 @@ export async function POST(req: Request) {
             payment_status: 'paid',
             stripe_payment_intent_id: session.payment_intent as string,
           })
-          .eq('stripe_checkout_session_id', session.id)
+          .eq('stripe_session_id', session.id)
 
         if (error) {
           console.error('Error updating order:', error)
         }
 
-        // Update inventory for each order item
+        // Fetch order for inventory, coupon updates, and email
         const { data: order } = await supabaseAdmin
           .from('orders')
-          .select('id')
-          .eq('stripe_checkout_session_id', session.id)
+          .select('*, order_items(*)')
+          .eq('stripe_session_id', session.id)
           .single()
 
         if (order) {
+          // Update inventory for each order item
           const { data: items } = await supabaseAdmin
             .from('order_items')
             .select('product_id, quantity')
@@ -64,6 +66,39 @@ export async function POST(req: Request) {
                 })
               }
             }
+          }
+
+          // Increment coupon usage if a coupon was applied
+          if (order.coupon_code) {
+            await supabaseAdmin.rpc('increment_coupon_usage', {
+              coupon_code: order.coupon_code,
+            })
+          }
+
+          // Send order confirmation email
+          try {
+            await sendOrderConfirmationEmail({
+              order_number: order.order_number,
+              email: order.email,
+              subtotal_cents: order.subtotal_cents,
+              discount_cents: order.discount_cents || 0,
+              shipping_cents: order.shipping_cents || 0,
+              tax_cents: order.tax_cents || 0,
+              total_cents: order.total_cents,
+              coupon_code: order.coupon_code,
+              shipping_address: order.shipping_address as {
+                fullName?: string
+                addressLine1?: string
+                addressLine2?: string
+                city?: string
+                state?: string
+                postalCode?: string
+                country?: string
+              },
+              order_items: order.order_items || [],
+            })
+          } catch (emailError) {
+            console.error('Failed to send order confirmation email:', emailError)
           }
         }
 

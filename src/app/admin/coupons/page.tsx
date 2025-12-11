@@ -96,16 +96,12 @@ export default function AdminCouponsPage() {
         description: coupon.description || '',
         discountType: coupon.discount_type as 'percentage' | 'fixed',
         discountValue: String(coupon.discount_value),
-        minPurchaseCents: coupon.min_purchase_cents
-          ? String(coupon.min_purchase_cents / 100)
+        minPurchaseCents: coupon.min_order_cents
+          ? String(coupon.min_order_cents / 100)
           : '',
-        maxDiscountCents: coupon.max_discount_cents
-          ? String(coupon.max_discount_cents / 100)
-          : '',
-        usageLimit: coupon.usage_limit ? String(coupon.usage_limit) : '',
-        startsAt: coupon.starts_at
-          ? new Date(coupon.starts_at).toISOString().slice(0, 16)
-          : '',
+        maxDiscountCents: '',
+        usageLimit: coupon.max_uses ? String(coupon.max_uses) : '',
+        startsAt: '',
         expiresAt: coupon.expires_at
           ? new Date(coupon.expires_at).toISOString().slice(0, 16)
           : '',
@@ -205,13 +201,10 @@ export default function AdminCouponsPage() {
     if (!coupon.is_active) return { label: 'Inactive', variant: 'secondary' as const }
 
     const now = new Date()
-    if (coupon.starts_at && new Date(coupon.starts_at) > now) {
-      return { label: 'Scheduled', variant: 'warning' as const }
-    }
     if (coupon.expires_at && new Date(coupon.expires_at) < now) {
       return { label: 'Expired', variant: 'destructive' as const }
     }
-    if (coupon.usage_limit && coupon.usage_count >= coupon.usage_limit) {
+    if (coupon.max_uses && coupon.current_uses >= coupon.max_uses) {
       return { label: 'Exhausted', variant: 'destructive' as const }
     }
     return { label: 'Active', variant: 'success' as const }
@@ -459,27 +452,24 @@ export default function AdminCouponsPage() {
                           ? `${coupon.discount_value}%`
                           : formatPrice(coupon.discount_value * 100)}
                       </span>
-                      {coupon.min_purchase_cents && (
+                      {coupon.min_order_cents && (
                         <p className="text-xs text-brand-light-gray">
-                          Min: {formatPrice(coupon.min_purchase_cents)}
+                          Min: {formatPrice(coupon.min_order_cents)}
                         </p>
                       )}
                     </TableCell>
                     <TableCell>
                       <span className="font-mono text-sm">
-                        {coupon.usage_count}
-                        {coupon.usage_limit && ` / ${coupon.usage_limit}`}
+                        {coupon.current_uses}
+                        {coupon.max_uses && ` / ${coupon.max_uses}`}
                       </span>
                     </TableCell>
                     <TableCell>
                       <div className="text-xs text-brand-light-gray">
-                        {coupon.starts_at && (
-                          <p>From: {formatDate(coupon.starts_at)}</p>
-                        )}
                         {coupon.expires_at && (
                           <p>Until: {formatDate(coupon.expires_at)}</p>
                         )}
-                        {!coupon.starts_at && !coupon.expires_at && (
+                        {!coupon.expires_at && (
                           <p>Always valid</p>
                         )}
                       </div>

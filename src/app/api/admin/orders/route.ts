@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { sendShippingNotificationEmail } from '@/lib/email'
 
 async function checkAdminAuth() {
   const supabase = await createClient()
@@ -146,6 +147,41 @@ export async function PUT(req: Request) {
         status,
         changed_by: auth.user.id,
       })
+
+      // Send shipping notification email when status is changed to shipped
+      if (status === 'shipped') {
+        try {
+          // Fetch full order with items for email
+          const { data: fullOrder } = await supabaseAdmin
+            .from('orders')
+            .select('*, order_items(*)')
+            .eq('id', id)
+            .single()
+
+          if (fullOrder) {
+            await sendShippingNotificationEmail({
+              order_number: fullOrder.order_number,
+              email: fullOrder.email,
+              shipping_carrier: fullOrder.shipping_carrier,
+              tracking_number: fullOrder.tracking_number,
+              tracking_url: fullOrder.tracking_url,
+              estimated_delivery: fullOrder.estimated_delivery,
+              shipping_address: fullOrder.shipping_address as {
+                fullName?: string
+                addressLine1?: string
+                addressLine2?: string
+                city?: string
+                state?: string
+                postalCode?: string
+                country?: string
+              },
+              order_items: fullOrder.order_items || [],
+            })
+          }
+        } catch (emailError) {
+          console.error('Failed to send shipping notification email:', emailError)
+        }
+      }
     }
 
     return NextResponse.json({ order })

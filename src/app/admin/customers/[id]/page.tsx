@@ -279,10 +279,10 @@ export default function AdminCustomerDetailPage() {
                         <MapPin className="h-4 w-4 text-brand-light-gray mt-0.5" />
                         <address className="not-italic text-sm text-brand-light-gray">
                           <p className="text-brand-white font-medium">
-                            {address.full_name}
+                            {address.name}
                           </p>
-                          <p>{address.address_line1}</p>
-                          {address.address_line2 && <p>{address.address_line2}</p>}
+                          <p>{address.line1}</p>
+                          {address.line2 && <p>{address.line2}</p>}
                           <p>
                             {address.city}, {address.state} {address.postal_code}
                           </p>

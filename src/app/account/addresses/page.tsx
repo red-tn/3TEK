@@ -74,9 +74,9 @@ export default function AddressesPage() {
         const { error } = await supabase
           .from('addresses')
           .update({
-            full_name: data.fullName,
-            address_line1: data.addressLine1,
-            address_line2: data.addressLine2,
+            name: data.fullName,
+            line1: data.addressLine1,
+            line2: data.addressLine2,
             city: data.city,
             state: data.state,
             postal_code: data.postalCode,
@@ -91,9 +91,9 @@ export default function AddressesPage() {
         // Create new address
         const { error } = await supabase.from('addresses').insert({
           user_id: user.id,
-          full_name: data.fullName,
-          address_line1: data.addressLine1,
-          address_line2: data.addressLine2,
+          name: data.fullName,
+          line1: data.addressLine1,
+          line2: data.addressLine2,
           city: data.city,
           state: data.state,
           postal_code: data.postalCode,
@@ -119,9 +119,9 @@ export default function AddressesPage() {
   const handleEdit = (address: Address) => {
     setEditingAddress(address)
     reset({
-      fullName: address.full_name,
-      addressLine1: address.address_line1,
-      addressLine2: address.address_line2 || '',
+      fullName: address.name,
+      addressLine1: address.line1,
+      addressLine2: address.line2 || '',
       city: address.city,
       state: address.state,
       postalCode: address.postal_code,
@@ -312,10 +312,10 @@ export default function AddressesPage() {
               )}
               <address className="not-italic text-sm text-brand-light-gray space-y-1">
                 <p className="text-brand-white font-medium">
-                  {address.full_name}
+                  {address.name}
                 </p>
-                <p>{address.address_line1}</p>
-                {address.address_line2 && <p>{address.address_line2}</p>}
+                <p>{address.line1}</p>
+                {address.line2 && <p>{address.line2}</p>}
                 <p>
                   {address.city}, {address.state} {address.postal_code}
                 </p>

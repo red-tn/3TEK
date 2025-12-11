@@ -12,31 +12,28 @@ export type Database = {
       profiles: {
         Row: {
           id: string
-          email: string
+          email: string | null
           full_name: string | null
           phone: string | null
-          role: 'customer' | 'admin' | 'super_admin'
-          stripe_customer_id: string | null
+          is_admin: boolean
           created_at: string
           updated_at: string
         }
         Insert: {
           id: string
-          email: string
+          email?: string | null
           full_name?: string | null
           phone?: string | null
-          role?: 'customer' | 'admin' | 'super_admin'
-          stripe_customer_id?: string | null
+          is_admin?: boolean
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          email?: string
+          email?: string | null
           full_name?: string | null
           phone?: string | null
-          role?: 'customer' | 'admin' | 'super_admin'
-          stripe_customer_id?: string | null
+          is_admin?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -45,48 +42,45 @@ export type Database = {
         Row: {
           id: string
           user_id: string
-          type: 'shipping' | 'billing'
-          is_default: boolean
-          full_name: string
-          address_line1: string
-          address_line2: string | null
+          name: string
+          line1: string
+          line2: string | null
           city: string
           state: string
           postal_code: string
           country: string
           phone: string | null
+          is_default: boolean
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          type?: 'shipping' | 'billing'
-          is_default?: boolean
-          full_name: string
-          address_line1: string
-          address_line2?: string | null
+          name: string
+          line1: string
+          line2?: string | null
           city: string
           state: string
           postal_code: string
           country?: string
           phone?: string | null
+          is_default?: boolean
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           user_id?: string
-          type?: 'shipping' | 'billing'
-          is_default?: boolean
-          full_name?: string
-          address_line1?: string
-          address_line2?: string | null
+          name?: string
+          line1?: string
+          line2?: string | null
           city?: string
           state?: string
           postal_code?: string
           country?: string
           phone?: string | null
+          is_default?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -132,90 +126,67 @@ export type Database = {
           name: string
           slug: string
           description: string | null
-          short_description: string | null
-          category_id: string | null
           price_cents: number
           compare_at_price_cents: number | null
-          cost_cents: number | null
-          sku: string | null
-          stock_quantity: number
-          track_inventory: boolean
-          allow_backorder: boolean
-          weight_oz: number | null
-          dimensions_inches: Json | null
-          material: string | null
-          color: string | null
-          print_time_hours: number | null
-          images: ProductImage[]
+          category_id: string | null
+          images: string[]
           is_active: boolean
           is_featured: boolean
-          badge: string | null
-          stripe_product_id: string | null
-          stripe_price_id: string | null
-          meta_title: string | null
-          meta_description: string | null
+          stock_quantity: number
+          sku: string | null
+          weight_grams: number | null
+          dimensions: Json | null
+          metadata: Json
           created_at: string
           updated_at: string
+          // Extended fields (add via migration if needed)
+          short_description?: string | null
+          track_inventory?: boolean
+          badge?: string | null
         }
         Insert: {
           id?: string
           name: string
           slug: string
           description?: string | null
-          short_description?: string | null
-          category_id?: string | null
           price_cents: number
           compare_at_price_cents?: number | null
-          cost_cents?: number | null
-          sku?: string | null
-          stock_quantity?: number
-          track_inventory?: boolean
-          allow_backorder?: boolean
-          weight_oz?: number | null
-          dimensions_inches?: Json | null
-          material?: string | null
-          color?: string | null
-          print_time_hours?: number | null
-          images?: ProductImage[]
+          category_id?: string | null
+          images?: string[]
           is_active?: boolean
           is_featured?: boolean
-          badge?: string | null
-          stripe_product_id?: string | null
-          stripe_price_id?: string | null
-          meta_title?: string | null
-          meta_description?: string | null
+          stock_quantity?: number
+          sku?: string | null
+          weight_grams?: number | null
+          dimensions?: Json | null
+          metadata?: Json
           created_at?: string
           updated_at?: string
+          short_description?: string | null
+          track_inventory?: boolean
+          badge?: string | null
         }
         Update: {
           id?: string
           name?: string
           slug?: string
           description?: string | null
-          short_description?: string | null
-          category_id?: string | null
           price_cents?: number
           compare_at_price_cents?: number | null
-          cost_cents?: number | null
-          sku?: string | null
-          stock_quantity?: number
-          track_inventory?: boolean
-          allow_backorder?: boolean
-          weight_oz?: number | null
-          dimensions_inches?: Json | null
-          material?: string | null
-          color?: string | null
-          print_time_hours?: number | null
-          images?: ProductImage[]
+          category_id?: string | null
+          images?: string[]
           is_active?: boolean
           is_featured?: boolean
-          badge?: string | null
-          stripe_product_id?: string | null
-          stripe_price_id?: string | null
-          meta_title?: string | null
-          meta_description?: string | null
+          stock_quantity?: number
+          sku?: string | null
+          weight_grams?: number | null
+          dimensions?: Json | null
+          metadata?: Json
           created_at?: string
           updated_at?: string
+          short_description?: string | null
+          track_inventory?: boolean
+          badge?: string | null
         }
       }
       orders: {
@@ -223,59 +194,49 @@ export type Database = {
           id: string
           order_number: string
           user_id: string | null
-          guest_email: string | null
-          status: OrderStatus
-          payment_status: PaymentStatus
-          stripe_checkout_session_id: string | null
-          stripe_payment_intent_id: string | null
+          email: string
+          status: string
+          payment_status: string
           subtotal_cents: number
-          discount_cents: number
           shipping_cents: number
           tax_cents: number
+          discount_cents: number
           total_cents: number
-          shipping_method: string | null
-          shipping_carrier: string | null
-          tracking_number: string | null
-          tracking_url: string | null
-          estimated_delivery: string | null
-          shipped_at: string | null
-          delivered_at: string | null
           shipping_address: Json
           billing_address: Json | null
+          stripe_session_id: string | null
+          stripe_payment_intent_id: string | null
+          coupon_code: string | null
           notes: string | null
-          admin_notes: string | null
-          ip_address: string | null
-          user_agent: string | null
+          tracking_number: string | null
+          tracking_url: string | null
+          shipped_at: string | null
+          delivered_at: string | null
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
-          order_number?: string
+          order_number: string
           user_id?: string | null
-          guest_email?: string | null
-          status?: OrderStatus
-          payment_status?: PaymentStatus
-          stripe_checkout_session_id?: string | null
-          stripe_payment_intent_id?: string | null
-          subtotal_cents?: number
-          discount_cents?: number
+          email: string
+          status?: string
+          payment_status?: string
+          subtotal_cents: number
           shipping_cents?: number
           tax_cents?: number
-          total_cents?: number
-          shipping_method?: string | null
-          shipping_carrier?: string | null
-          tracking_number?: string | null
-          tracking_url?: string | null
-          estimated_delivery?: string | null
-          shipped_at?: string | null
-          delivered_at?: string | null
+          discount_cents?: number
+          total_cents: number
           shipping_address: Json
           billing_address?: Json | null
+          stripe_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          coupon_code?: string | null
           notes?: string | null
-          admin_notes?: string | null
-          ip_address?: string | null
-          user_agent?: string | null
+          tracking_number?: string | null
+          tracking_url?: string | null
+          shipped_at?: string | null
+          delivered_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -283,29 +244,24 @@ export type Database = {
           id?: string
           order_number?: string
           user_id?: string | null
-          guest_email?: string | null
-          status?: OrderStatus
-          payment_status?: PaymentStatus
-          stripe_checkout_session_id?: string | null
-          stripe_payment_intent_id?: string | null
+          email?: string
+          status?: string
+          payment_status?: string
           subtotal_cents?: number
-          discount_cents?: number
           shipping_cents?: number
           tax_cents?: number
+          discount_cents?: number
           total_cents?: number
-          shipping_method?: string | null
-          shipping_carrier?: string | null
-          tracking_number?: string | null
-          tracking_url?: string | null
-          estimated_delivery?: string | null
-          shipped_at?: string | null
-          delivered_at?: string | null
           shipping_address?: Json
           billing_address?: Json | null
+          stripe_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          coupon_code?: string | null
           notes?: string | null
-          admin_notes?: string | null
-          ip_address?: string | null
-          user_agent?: string | null
+          tracking_number?: string | null
+          tracking_url?: string | null
+          shipped_at?: string | null
+          delivered_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -316,14 +272,9 @@ export type Database = {
           order_id: string
           product_id: string | null
           product_name: string
-          product_sku: string | null
           product_image: string | null
           quantity: number
-          unit_price_cents: number
-          total_cents: number
-          print_status: PrintStatus
-          print_started_at: string | null
-          print_completed_at: string | null
+          price_cents: number
           created_at: string
         }
         Insert: {
@@ -331,14 +282,9 @@ export type Database = {
           order_id: string
           product_id?: string | null
           product_name: string
-          product_sku?: string | null
           product_image?: string | null
           quantity: number
-          unit_price_cents: number
-          total_cents: number
-          print_status?: PrintStatus
-          print_started_at?: string | null
-          print_completed_at?: string | null
+          price_cents: number
           created_at?: string
         }
         Update: {
@@ -346,40 +292,9 @@ export type Database = {
           order_id?: string
           product_id?: string | null
           product_name?: string
-          product_sku?: string | null
           product_image?: string | null
           quantity?: number
-          unit_price_cents?: number
-          total_cents?: number
-          print_status?: PrintStatus
-          print_started_at?: string | null
-          print_completed_at?: string | null
-          created_at?: string
-        }
-      }
-      order_status_history: {
-        Row: {
-          id: string
-          order_id: string
-          status: OrderStatus
-          note: string | null
-          changed_by: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          order_id: string
-          status: OrderStatus
-          note?: string | null
-          changed_by?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          order_id?: string
-          status?: OrderStatus
-          note?: string | null
-          changed_by?: string | null
+          price_cents?: number
           created_at?: string
         }
       }
@@ -388,67 +303,41 @@ export type Database = {
           id: string
           code: string
           description: string | null
-          discount_type: 'percentage' | 'fixed_amount'
+          discount_type: string
           discount_value: number
-          minimum_order_cents: number | null
-          maximum_uses: number | null
+          min_order_cents: number
+          max_uses: number | null
           current_uses: number
-          starts_at: string | null
           expires_at: string | null
           is_active: boolean
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          code: string
-          description?: string | null
-          discount_type: 'percentage' | 'fixed_amount'
-          discount_value: number
-          minimum_order_cents?: number | null
-          maximum_uses?: number | null
-          current_uses?: number
-          starts_at?: string | null
-          expires_at?: string | null
-          is_active?: boolean
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          code?: string
-          description?: string | null
-          discount_type?: 'percentage' | 'fixed_amount'
-          discount_value?: number
-          minimum_order_cents?: number | null
-          maximum_uses?: number | null
-          current_uses?: number
-          starts_at?: string | null
-          expires_at?: string | null
-          is_active?: boolean
-          created_at?: string
-        }
-      }
-      cart_items: {
-        Row: {
-          id: string
-          user_id: string
-          product_id: string
-          quantity: number
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
-          user_id: string
-          product_id: string
-          quantity: number
+          code: string
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          min_order_cents?: number
+          max_uses?: number | null
+          current_uses?: number
+          expires_at?: string | null
+          is_active?: boolean
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
-          user_id?: string
-          product_id?: string
-          quantity?: number
+          code?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          min_order_cents?: number
+          max_uses?: number | null
+          current_uses?: number
+          expires_at?: string | null
+          is_active?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -458,76 +347,99 @@ export type Database = {
           id: string
           name: string
           description: string | null
-          carrier: string | null
-          min_weight_oz: number | null
-          max_weight_oz: number | null
-          min_order_cents: number | null
+          price_cents: number
+          min_order_cents: number
           max_order_cents: number | null
-          rate_cents: number
           estimated_days_min: number | null
           estimated_days_max: number | null
           is_active: boolean
-          display_order: number
           created_at: string
+          updated_at: string
         }
         Insert: {
           id?: string
           name: string
           description?: string | null
-          carrier?: string | null
-          min_weight_oz?: number | null
-          max_weight_oz?: number | null
-          min_order_cents?: number | null
+          price_cents: number
+          min_order_cents?: number
           max_order_cents?: number | null
-          rate_cents: number
           estimated_days_min?: number | null
           estimated_days_max?: number | null
           is_active?: boolean
-          display_order?: number
           created_at?: string
+          updated_at?: string
         }
         Update: {
           id?: string
           name?: string
           description?: string | null
-          carrier?: string | null
-          min_weight_oz?: number | null
-          max_weight_oz?: number | null
-          min_order_cents?: number | null
+          price_cents?: number
+          min_order_cents?: number
           max_order_cents?: number | null
-          rate_cents?: number
           estimated_days_min?: number | null
           estimated_days_max?: number | null
           is_active?: boolean
-          display_order?: number
           created_at?: string
+          updated_at?: string
         }
       }
-      site_settings: {
+      store_settings: {
         Row: {
+          id: string
           key: string
           value: Json
+          created_at: string
           updated_at: string
         }
         Insert: {
+          id?: string
           key: string
           value: Json
+          created_at?: string
           updated_at?: string
         }
         Update: {
+          id?: string
           key?: string
           value?: Json
+          created_at?: string
           updated_at?: string
         }
       }
-    }
-    Enums: {
-      order_status: OrderStatus
-      payment_status: PaymentStatus
+      contact_messages: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          subject: string | null
+          message: string
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          email: string
+          subject?: string | null
+          message: string
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          email?: string
+          subject?: string | null
+          message?: string
+          is_read?: boolean
+          created_at?: string
+        }
+      }
     }
   }
 }
 
+// Order status values
 export type OrderStatus =
   | 'pending'
   | 'confirmed'
@@ -540,6 +452,7 @@ export type OrderStatus =
   | 'cancelled'
   | 'refunded'
 
+// Payment status values
 export type PaymentStatus =
   | 'pending'
   | 'paid'
@@ -547,40 +460,17 @@ export type PaymentStatus =
   | 'refunded'
   | 'partially_refunded'
 
-export type PrintStatus =
-  | 'pending'
-  | 'queued'
-  | 'printing'
-  | 'completed'
-  | 'failed'
-
-export type ProductImage = {
-  url: string
-  alt?: string
-  is_primary?: boolean
-}
-
-export type Tables<T extends keyof Database['public']['Tables']> =
-  Database['public']['Tables'][T]['Row']
-
-export type InsertTables<T extends keyof Database['public']['Tables']> =
-  Database['public']['Tables'][T]['Insert']
-
-export type UpdateTables<T extends keyof Database['public']['Tables']> =
-  Database['public']['Tables'][T]['Update']
-
 // Convenience type aliases
-export type Profile = Tables<'profiles'>
-export type Address = Tables<'addresses'>
-export type Category = Tables<'categories'>
-export type Product = Tables<'products'>
-export type Order = Tables<'orders'>
-export type OrderItem = Tables<'order_items'>
-export type OrderStatusHistory = Tables<'order_status_history'>
-export type Coupon = Tables<'coupons'>
-export type CartItem = Tables<'cart_items'>
-export type ShippingRate = Tables<'shipping_rates'>
-export type SiteSetting = Tables<'site_settings'>
+export type Profile = Database['public']['Tables']['profiles']['Row']
+export type Address = Database['public']['Tables']['addresses']['Row']
+export type Category = Database['public']['Tables']['categories']['Row']
+export type Product = Database['public']['Tables']['products']['Row']
+export type Order = Database['public']['Tables']['orders']['Row']
+export type OrderItem = Database['public']['Tables']['order_items']['Row']
+export type Coupon = Database['public']['Tables']['coupons']['Row']
+export type ShippingRate = Database['public']['Tables']['shipping_rates']['Row']
+export type StoreSetting = Database['public']['Tables']['store_settings']['Row']
+export type ContactMessage = Database['public']['Tables']['contact_messages']['Row']
 
 // Extended types with relations
 export type ProductWithCategory = Product & {
