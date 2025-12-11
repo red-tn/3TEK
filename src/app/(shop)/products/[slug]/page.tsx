@@ -34,7 +34,11 @@ export async function generateMetadata({
     }
   }
 
-  const primaryImage = product.images?.find((img) => img.is_primary) || product.images?.[0]
+  // Handle both string array and object array for images
+  const firstImage = product.images?.[0]
+  const primaryImageUrl = firstImage
+    ? (typeof firstImage === 'string' ? firstImage : firstImage.url)
+    : null
 
   return {
     title: product.meta_title || product.name,
@@ -42,7 +46,7 @@ export async function generateMetadata({
     openGraph: {
       title: product.meta_title || product.name,
       description: product.meta_description || product.short_description || undefined,
-      images: primaryImage?.url ? [primaryImage.url] : undefined,
+      images: primaryImageUrl ? [primaryImageUrl] : undefined,
     },
   }
 }
@@ -71,7 +75,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .neq('id', product.id)
     .limit(4)
 
-  const primaryImage = product.images?.find((img) => img.is_primary) || product.images?.[0]
+  // Handle both string array and object array for images
+  const firstImage = product.images?.[0]
+  const primaryImageUrl = firstImage
+    ? (typeof firstImage === 'string' ? firstImage : firstImage.url)
+    : null
   const isOnSale =
     product.compare_at_price_cents &&
     product.compare_at_price_cents > product.price_cents
@@ -181,7 +189,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 id: product.id,
                 name: product.name,
                 price: product.price_cents,
-                image: primaryImage?.url,
+                image: primaryImageUrl ?? undefined,
                 sku: product.sku ?? undefined,
               }}
               size="lg"

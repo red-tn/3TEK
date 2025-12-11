@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select'
 import { ArrowLeft, Save, Trash2 } from 'lucide-react'
 import { ImageUploader } from '@/components/admin/image-uploader'
-import { slugify } from '@/lib/utils'
+import { slugify, generateSku } from '@/lib/utils'
 import type { Category, Product } from '@/types/database'
 
 export default function EditProductPage() {
@@ -111,10 +111,14 @@ export default function EditProductPage() {
   }
 
   const handleNameChange = (name: string) => {
+    const newSlug = slugify(name)
+    // Only auto-generate SKU if it's empty or follows the auto-generated pattern
+    const shouldGenerateSku = !formData.sku || formData.sku.startsWith('3T-')
     setFormData({
       ...formData,
       name,
-      slug: slugify(name),
+      slug: newSlug,
+      sku: shouldGenerateSku ? generateSku(name) : formData.sku,
     })
   }
 

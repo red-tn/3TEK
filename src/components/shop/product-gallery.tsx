@@ -3,11 +3,17 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
-import type { ProductImage } from '@/types/database'
+
+type ImageInput = string | { url: string; alt?: string }
 
 interface ProductGalleryProps {
-  images: ProductImage[]
+  images: ImageInput[]
   productName: string
+}
+
+// Helper to get URL from either string or object format
+function getImageUrl(img: ImageInput): string {
+  return typeof img === 'string' ? img : img.url
 }
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
@@ -29,15 +35,15 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
     )
   }
 
-  const selectedImage = images[selectedIndex]
+  const selectedImageUrl = getImageUrl(images[selectedIndex])
 
   return (
     <div className="space-y-4">
       {/* Main Image */}
       <div className="relative aspect-square bg-brand-darker border border-brand-gray overflow-hidden clip-corners-lg">
         <Image
-          src={selectedImage.url}
-          alt={selectedImage.alt || productName}
+          src={selectedImageUrl}
+          alt={productName}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 50vw"
@@ -60,8 +66,8 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               )}
             >
               <Image
-                src={image.url}
-                alt={image.alt || `${productName} ${index + 1}`}
+                src={getImageUrl(image)}
+                alt={`${productName} ${index + 1}`}
                 fill
                 className="object-cover"
                 sizes="80px"

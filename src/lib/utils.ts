@@ -44,6 +44,18 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
+export function generateSku(name: string): string {
+  // Take first letters of words, uppercase, add random numbers
+  const prefix = name
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join('')
+    .slice(0, 4)
+    .padEnd(2, 'X')
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
+  return `3T-${prefix}-${random}`
+}
+
 export function truncate(text: string, length: number): string {
   if (text.length <= length) return text
   return text.slice(0, length) + '...'

@@ -10,9 +10,11 @@ interface ProductCardProduct {
   slug: string
   price_cents: number
   compare_at_price_cents?: number | null
-  images?: Array<{ url: string; alt?: string; is_primary?: boolean }> | null
+  images?: Array<string | { url: string; alt?: string; is_primary?: boolean }> | null
   badge?: string | null
-  category?: { name: string } | null
+  category?: { name: string; slug?: string } | null
+  metadata?: { short_description?: string; badge?: string } | null
+  sku?: string | null
 }
 
 interface ProductCardProps {
@@ -20,8 +22,18 @@ interface ProductCardProps {
   className?: string
 }
 
+// Helper to get image URL from either string or object format
+function getImageUrl(img: string | { url: string }): string {
+  return typeof img === 'string' ? img : img.url
+}
+
 export function ProductCard({ product, className }: ProductCardProps) {
-  const primaryImage = product.images?.find((img) => img.is_primary) || product.images?.[0]
+  // Handle both string array and object array formats
+  const firstImage = product.images?.[0]
+  const primaryImageUrl = firstImage ? getImageUrl(firstImage) : null
+
+  // Badge can be in metadata or directly on product
+  const badge = product.badge || product.metadata?.badge
 
   return (
     <article
@@ -38,10 +50,10 @@ export function ProductCard({ product, className }: ProductCardProps) {
         href={`/products/${product.slug}`}
         className="block relative h-64 bg-brand-gray"
       >
-        {primaryImage ? (
+        {primaryImageUrl ? (
           <Image
-            src={primaryImage.url}
-            alt={primaryImage.alt || product.name}
+            src={primaryImageUrl}
+            alt={product.name}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -60,8 +72,8 @@ export function ProductCard({ product, className }: ProductCardProps) {
           </div>
         )}
 
-        {product.badge && (
-          <Badge className="absolute top-3 right-3 z-10">{product.badge}</Badge>
+        {badge && (
+          <Badge className="absolute top-3 right-3 z-10">{badge}</Badge>
         )}
 
         {product.compare_at_price_cents &&
@@ -113,7 +125,7 @@ export function ProductCard({ product, className }: ProductCardProps) {
               id: product.id,
               name: product.name,
               price: product.price_cents,
-              image: primaryImage?.url,
+              image: primaryImageUrl ?? undefined,
               sku: product.sku ?? undefined,
             }}
             size="sm"
