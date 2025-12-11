@@ -13,6 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Plus, Edit, Package } from 'lucide-react'
+import { DeleteProductButton } from '@/components/admin/delete-product-button'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -152,11 +153,17 @@ export default async function AdminProductsPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/admin/products/${product.id}`}>
-                          <Edit className="h-4 w-4" />
-                        </Link>
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" size="icon" asChild>
+                          <Link href={`/admin/products/${product.id}`}>
+                            <Edit className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                        <DeleteProductButton
+                          productId={product.id}
+                          productName={product.name}
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 )
