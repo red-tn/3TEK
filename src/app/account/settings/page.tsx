@@ -15,9 +15,14 @@ import { Save, LogOut } from 'lucide-react'
 export default function SettingsPage() {
   const router = useRouter()
   const { success, error: showError } = useToast()
+  const [mounted, setMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [email, setEmail] = useState('')
   const supabase = createClient()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const {
     register,
@@ -91,7 +96,7 @@ export default function SettingsPage() {
     router.refresh()
   }
 
-  if (isLoading) {
+  if (!mounted || isLoading) {
     return (
       <div className="space-y-8">
         <div className="h-8 w-48 bg-brand-gray animate-pulse" />

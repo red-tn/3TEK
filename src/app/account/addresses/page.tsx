@@ -20,12 +20,17 @@ import { addressSchema, type AddressInput } from '@/lib/validations'
 import type { Address } from '@/types/database'
 
 export default function AddressesPage() {
+  const [mounted, setMounted] = useState(false)
   const [addresses, setAddresses] = useState<Address[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingAddress, setEditingAddress] = useState<Address | null>(null)
   const { success, error: showError } = useToast()
   const supabase = createClient()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const {
     register,
@@ -287,7 +292,7 @@ export default function AddressesPage() {
         </Dialog>
       </div>
 
-      {isLoading ? (
+      {!mounted || isLoading ? (
         <div className="grid gap-4 md:grid-cols-2">
           {[1, 2].map((i) => (
             <div
