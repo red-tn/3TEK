@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ArrowLeft, Eye, Mail, MapPin, Calendar, ShoppingBag } from 'lucide-react'
+import { ArrowLeft, Eye, Mail, MapPin, Calendar, ShoppingBag, Shield, ShieldOff } from 'lucide-react'
 import type { Profile, Order, Address } from '@/types/database'
 
 type CustomerWithOrders = Profile & {
@@ -27,9 +27,10 @@ type CustomerWithOrders = Profile & {
 export default function AdminCustomerDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { error: showError } = useToast()
+  const { error: showError, success } = useToast()
   const [customer, setCustomer] = useState<CustomerWithOrders | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isTogglingAdmin, setIsTogglingAdmin] = useState(false)
 
   const supabase = createClient()
 
@@ -52,6 +53,31 @@ export default function AdminCustomerDetailPage() {
 
     setCustomer(data as CustomerWithOrders)
     setIsLoading(false)
+  }
+
+  const toggleAdminStatus = async () => {
+    if (!customer) return
+
+    setIsTogglingAdmin(true)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_admin: !customer.is_admin })
+        .eq('id', customer.id)
+
+      if (error) throw error
+
+      setCustomer({ ...customer, is_admin: !customer.is_admin })
+      success(
+        'Admin status updated',
+        customer.is_admin ? 'User is no longer an admin' : 'User is now an admin'
+      )
+    } catch (err) {
+      console.error('Toggle admin error:', err)
+      showError('Error', 'Failed to update admin status')
+    } finally {
+      setIsTogglingAdmin(false)
+    }
   }
 
   if (isLoading || !customer) {
@@ -78,12 +104,37 @@ export default function AdminCustomerDetailPage() {
         </Button>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-3xl text-brand-white mb-1">
-              {customer.full_name || 'No Name'}
-            </h1>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="font-display text-3xl text-brand-white">
+                {customer.full_name || 'No Name'}
+              </h1>
+              {customer.is_admin && (
+                <Badge variant="default" className="bg-brand-neon text-brand-black">
+                  <Shield className="h-3 w-3 mr-1" />
+                  Admin
+                </Badge>
+              )}
+            </div>
             <p className="text-brand-light-gray">{customer.email}</p>
           </div>
-          <Badge variant="success">Active</Badge>
+          <Button
+            variant={customer.is_admin ? 'outline' : 'default'}
+            size="sm"
+            onClick={toggleAdminStatus}
+            disabled={isTogglingAdmin}
+          >
+            {customer.is_admin ? (
+              <>
+                <ShieldOff className="h-4 w-4 mr-2" />
+                Remove Admin
+              </>
+            ) : (
+              <>
+                <Shield className="h-4 w-4 mr-2" />
+                Make Admin
+              </>
+            )}
+          </Button>
         </div>
       </div>
 

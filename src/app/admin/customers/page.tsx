@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Eye, Users } from 'lucide-react'
+import { Eye, Users, Shield } from 'lucide-react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -24,7 +24,6 @@ export default async function AdminCustomersPage() {
   const { data: customers } = await supabase
     .from('profiles')
     .select('*, orders(count)')
-    .eq('role', 'customer')
     .order('created_at', { ascending: false })
     .limit(100)
 
@@ -82,7 +81,14 @@ export default async function AdminCustomersPage() {
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="success">Active</Badge>
+                    {customer.is_admin ? (
+                      <Badge variant="default" className="bg-brand-neon text-brand-black">
+                        <Shield className="h-3 w-3 mr-1" />
+                        Admin
+                      </Badge>
+                    ) : (
+                      <Badge variant="success">Customer</Badge>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" asChild>
