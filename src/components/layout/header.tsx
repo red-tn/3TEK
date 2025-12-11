@@ -21,7 +21,7 @@ import { Menu, ShoppingCart, User, LogOut, Package, Settings, LayoutDashboard } 
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const { user, profile, isAdmin, signOut } = useAuth()
+  const { user, profile, isAdmin, isLoading, signOut } = useAuth()
   const { itemCount, openCart } = useCart()
   const cartCount = itemCount()
 
@@ -38,7 +38,7 @@ export function Header() {
           {/* Actions */}
           <div className="flex items-center gap-2">
             {/* Admin Link */}
-            {isAdmin && (
+            {!isLoading && isAdmin && (
               <Button variant="ghost" size="icon" asChild>
                 <Link href="/admin" title="Admin Dashboard">
                   <LayoutDashboard className="h-5 w-5 text-brand-neon" />
@@ -62,7 +62,11 @@ export function Header() {
             </Button>
 
             {/* User Menu */}
-            {user ? (
+            {isLoading ? (
+              <Button variant="ghost" size="icon" disabled>
+                <User className="h-5 w-5 animate-pulse" />
+              </Button>
+            ) : user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">
