@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
@@ -18,7 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ArrowLeft, Save, Trash2, Upload, X, Package } from 'lucide-react'
+import { ArrowLeft, Save, Trash2 } from 'lucide-react'
+import { ImageUploader } from '@/components/admin/image-uploader'
 import { slugify } from '@/lib/utils'
 import type { Category, Product } from '@/types/database'
 
@@ -47,6 +47,7 @@ export default function EditProductPage() {
     isActive: true,
     isFeatured: false,
     badge: '',
+    images: [] as string[],
   })
 
   const supabase = createClient()
@@ -72,6 +73,10 @@ export default function EditProductPage() {
     setProduct(data)
     // Extra fields may be in metadata JSON column
     const metadata = data.metadata || {}
+    // Handle images - could be array of strings or array of objects
+    const imageUrls = (data.images || []).map((img: string | { url: string }) =>
+      typeof img === 'string' ? img : img.url
+    )
     setFormData({
       name: data.name,
       slug: data.slug,
@@ -90,6 +95,7 @@ export default function EditProductPage() {
       isActive: data.is_active,
       isFeatured: data.is_featured,
       badge: metadata.badge || '',
+      images: imageUrls,
     })
     setIsLoading(false)
   }
@@ -135,6 +141,7 @@ export default function EditProductPage() {
           stockQuantity: parseInt(formData.stockQuantity),
           isActive: formData.isActive,
           isFeatured: formData.isFeatured,
+          images: formData.images,
           // Extra fields stored in metadata
           shortDescription: formData.shortDescription || null,
           material: formData.material || null,
@@ -288,43 +295,12 @@ export default function EditProductPage() {
               <h2 className="font-display text-xl text-brand-white mb-4">
                 Images
               </h2>
-              <div className="grid grid-cols-4 gap-4">
-                {product.images && product.images.length > 0 ? (
-                  product.images.map((image, index) => (
-                    <div
-                      key={index}
-                      className="relative aspect-square bg-brand-gray clip-corners overflow-hidden group"
-                    >
-                      <Image
-                        src={getImageUrl(image)}
-                        alt={`Product image ${index + 1}`}
-                        fill
-                        className="object-cover"
-                        sizes="150px"
-                      />
-                      {index === 0 && (
-                        <div className="absolute top-2 left-2 bg-brand-neon text-brand-black text-xs px-2 py-1 clip-corners-sm">
-                          Primary
-                        </div>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <div className="col-span-4 aspect-video bg-brand-gray/20 border border-dashed border-brand-gray flex items-center justify-center clip-corners">
-                    <div className="text-center">
-                      <Package className="h-12 w-12 text-brand-light-gray/50 mx-auto mb-2" />
-                      <p className="text-sm text-brand-light-gray">No images</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <Button variant="outline" className="mt-4" type="button">
-                <Upload className="mr-2 h-4 w-4" />
-                Upload Images
-              </Button>
-              <p className="text-xs text-brand-light-gray mt-2">
-                Image upload functionality coming soon
-              </p>
+              <ImageUploader
+                images={formData.images}
+                onChange={(images) => setFormData({ ...formData, images })}
+                maxImages={8}
+                folder="products"
+              />
             </div>
 
             {/* Pricing */}

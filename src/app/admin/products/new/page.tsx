@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ArrowLeft, Save } from 'lucide-react'
+import { ImageUploader } from '@/components/admin/image-uploader'
 import { slugify } from '@/lib/utils'
 import type { Category } from '@/types/database'
 
@@ -42,6 +43,7 @@ export default function NewProductPage() {
     isActive: true,
     isFeatured: false,
     badge: '',
+    images: [] as string[],
   })
 
   const supabase = createClient()
@@ -94,7 +96,7 @@ export default function NewProductPage() {
           isActive: formData.isActive,
           isFeatured: formData.isFeatured,
           badge: formData.badge || null,
-          images: [],
+          images: formData.images,
         }),
       })
 
@@ -186,6 +188,19 @@ export default function NewProductPage() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Images */}
+            <div className="bg-brand-darker border border-brand-gray p-6 clip-corners">
+              <h2 className="font-display text-xl text-brand-white mb-4">
+                Images
+              </h2>
+              <ImageUploader
+                images={formData.images}
+                onChange={(images) => setFormData({ ...formData, images })}
+                maxImages={8}
+                folder="products"
+              />
             </div>
 
             {/* Pricing */}
@@ -369,16 +384,16 @@ export default function NewProductPage() {
                 Badge
               </h2>
               <Select
-                value={formData.badge}
+                value={formData.badge || 'none'}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, badge: value })
+                  setFormData({ ...formData, badge: value === 'none' ? '' : value })
                 }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="No badge" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   <SelectItem value="new">New</SelectItem>
                   <SelectItem value="popular">Popular</SelectItem>
                   <SelectItem value="sale">Sale</SelectItem>

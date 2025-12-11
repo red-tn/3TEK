@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,10 +13,11 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
-import { Save, Store, Mail, CreditCard, Truck, Bell } from 'lucide-react'
+import { Save, Store, Mail, CreditCard, Truck, Loader2 } from 'lucide-react'
 
 export default function AdminSettingsPage() {
   const { success, error: showError } = useToast()
+  const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
 
   const [storeSettings, setStoreSettings] = useState({
@@ -52,14 +53,56 @@ export default function AdminSettingsPage() {
     pickupAddress: '',
   })
 
-  const handleSave = async (section: string) => {
+  useEffect(() => {
+    fetchSettings()
+  }, [])
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/settings')
+      if (response.ok) {
+        const { settings } = await response.json()
+        if (settings.store) setStoreSettings(settings.store)
+        if (settings.email) setEmailSettings(settings.email)
+        if (settings.payment) setPaymentSettings(settings.payment)
+        if (settings.shipping) setShippingSettings(settings.shipping)
+      }
+    } catch (err) {
+      console.error('Failed to fetch settings:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSave = async (section: string, data: unknown) => {
     setIsSaving(true)
 
-    // Simulate saving - in a real app, this would call an API
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const response = await fetch('/api/admin/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: section.toLowerCase(), value: data }),
+      })
 
-    success('Settings saved', `${section} settings have been updated.`)
-    setIsSaving(false)
+      if (!response.ok) {
+        throw new Error('Failed to save settings')
+      }
+
+      success('Settings saved', `${section} settings have been updated.`)
+    } catch (err) {
+      console.error('Save error:', err)
+      showError('Error', 'Failed to save settings.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 text-brand-neon animate-spin" />
+      </div>
+    )
   }
 
   return (
@@ -170,7 +213,7 @@ export default function AdminSettingsPage() {
                 />
               </div>
               <Button
-                onClick={() => handleSave('Store')}
+                onClick={() => handleSave('Store', storeSettings)}
                 isLoading={isSaving}
               >
                 <Save className="mr-2 h-4 w-4" />
@@ -285,7 +328,7 @@ export default function AdminSettingsPage() {
               </div>
 
               <Button
-                onClick={() => handleSave('Email')}
+                onClick={() => handleSave('Email', emailSettings)}
                 isLoading={isSaving}
               >
                 <Save className="mr-2 h-4 w-4" />
@@ -399,7 +442,7 @@ export default function AdminSettingsPage() {
               </div>
 
               <Button
-                onClick={() => handleSave('Payment')}
+                onClick={() => handleSave('Payment', paymentSettings)}
                 isLoading={isSaving}
               >
                 <Save className="mr-2 h-4 w-4" />
@@ -493,7 +536,7 @@ export default function AdminSettingsPage() {
               </div>
 
               <Button
-                onClick={() => handleSave('Shipping')}
+                onClick={() => handleSave('Shipping', shippingSettings)}
                 isLoading={isSaving}
               >
                 <Save className="mr-2 h-4 w-4" />
