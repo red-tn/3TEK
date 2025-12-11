@@ -167,79 +167,37 @@ export async function PUT(req: Request) {
     }
 
     const body = await req.json()
-    const validatedData = productSchema.partial().parse(body)
 
-    // Get existing product
-    const { data: existingProduct } = await supabaseAdmin
-      .from('products')
-      .select('stripe_product_id, stripe_price_id, price_cents')
-      .eq('id', id)
-      .single()
+    // Build update object with only provided fields
+    const updateData: Record<string, unknown> = {}
 
-    // Update Stripe product if exists
-    if (existingProduct?.stripe_product_id) {
-      await stripe.products.update(existingProduct.stripe_product_id, {
-        name: validatedData.name,
-        description: validatedData.shortDescription || undefined,
-        images: validatedData.images?.slice(0, 8).map((img) => img.url),
-      })
-
-      // Create new price if price changed
-      if (
-        validatedData.priceCents &&
-        validatedData.priceCents !== existingProduct.price_cents
-      ) {
-        const newPrice = await stripe.prices.create({
-          product: existingProduct.stripe_product_id,
-          unit_amount: validatedData.priceCents,
-          currency: 'usd',
-        })
-
-        // Archive old price
-        if (existingProduct.stripe_price_id) {
-          await stripe.prices.update(existingProduct.stripe_price_id, {
-            active: false,
-          })
-        }
-
-        validatedData.priceCents = validatedData.priceCents
-        ;(body as Record<string, unknown>).stripe_price_id = newPrice.id
-      }
-    }
+    if (body.name !== undefined) updateData.name = body.name
+    if (body.slug !== undefined) updateData.slug = body.slug
+    if (body.description !== undefined) updateData.description = body.description
+    if (body.shortDescription !== undefined) updateData.short_description = body.shortDescription
+    if (body.categoryId !== undefined) updateData.category_id = body.categoryId
+    if (body.priceCents !== undefined) updateData.price_cents = body.priceCents
+    if (body.compareAtPriceCents !== undefined) updateData.compare_at_price_cents = body.compareAtPriceCents
+    if (body.sku !== undefined) updateData.sku = body.sku
+    if (body.stockQuantity !== undefined) updateData.stock_quantity = body.stockQuantity
+    if (body.material !== undefined) updateData.material = body.material
+    if (body.color !== undefined) updateData.color = body.color
+    if (body.isActive !== undefined) updateData.is_active = body.isActive
+    if (body.isFeatured !== undefined) updateData.is_featured = body.isFeatured
+    if (body.badge !== undefined) updateData.badge = body.badge || null
 
     // Update product in database
     const { data: product, error } = await supabaseAdmin
       .from('products')
-      .update({
-        name: validatedData.name,
-        slug: validatedData.slug,
-        description: validatedData.description,
-        short_description: validatedData.shortDescription,
-        category_id: validatedData.categoryId,
-        price_cents: validatedData.priceCents,
-        compare_at_price_cents: validatedData.compareAtPriceCents,
-        cost_cents: validatedData.costCents,
-        sku: validatedData.sku,
-        stock_quantity: validatedData.stockQuantity,
-        track_inventory: validatedData.trackInventory,
-        allow_backorder: validatedData.allowBackorder,
-        weight_oz: validatedData.weightOz,
-        material: validatedData.material,
-        color: validatedData.color,
-        print_time_hours: validatedData.printTimeHours,
-        images: validatedData.images,
-        is_active: validatedData.isActive,
-        is_featured: validatedData.isFeatured,
-        badge: validatedData.badge,
-        meta_title: validatedData.metaTitle,
-        meta_description: validatedData.metaDescription,
-        stripe_price_id: (body as Record<string, unknown>).stripe_price_id as string | undefined,
-      })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      console.error('Database error:', error)
+      throw error
+    }
 
     return NextResponse.json({ product })
   } catch (error) {
