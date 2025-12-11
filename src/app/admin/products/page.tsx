@@ -63,18 +63,20 @@ export default async function AdminProductsPage() {
             </TableHeader>
             <TableBody>
               {products.map((product) => {
-                const primaryImage =
-                  product.images?.find((img) => img.is_primary) ||
-                  product.images?.[0]
+                // Handle both string array and object array formats
+                const firstImage = product.images?.[0]
+                const primaryImageUrl = firstImage
+                  ? (typeof firstImage === 'string' ? firstImage : firstImage.url)
+                  : null
 
                 return (
                   <TableRow key={product.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="relative h-12 w-12 flex-shrink-0 bg-brand-gray clip-corners-sm overflow-hidden">
-                          {primaryImage ? (
+                          {primaryImageUrl ? (
                             <Image
-                              src={primaryImage.url}
+                              src={primaryImageUrl}
                               alt={product.name}
                               fill
                               className="object-cover"
