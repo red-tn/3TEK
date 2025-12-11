@@ -70,10 +70,12 @@ export default function EditProductPage() {
     }
 
     setProduct(data)
+    // Extra fields may be in metadata JSON column
+    const metadata = data.metadata || {}
     setFormData({
       name: data.name,
       slug: data.slug,
-      shortDescription: data.short_description || '',
+      shortDescription: metadata.short_description || '',
       description: data.description || '',
       categoryId: data.category_id || '',
       priceCents: String(data.price_cents / 100),
@@ -82,12 +84,12 @@ export default function EditProductPage() {
         : '',
       sku: data.sku || '',
       stockQuantity: String(data.stock_quantity),
-      trackInventory: data.track_inventory,
-      material: data.material || '',
-      color: data.color || '',
+      trackInventory: true, // Default since column doesn't exist
+      material: metadata.material || '',
+      color: metadata.color || '',
       isActive: data.is_active,
       isFeatured: data.is_featured,
-      badge: data.badge || '',
+      badge: metadata.badge || '',
     })
     setIsLoading(false)
   }
@@ -123,20 +125,20 @@ export default function EditProductPage() {
         body: JSON.stringify({
           name: formData.name,
           slug: formData.slug,
-          shortDescription: formData.shortDescription,
           description: formData.description,
           categoryId: formData.categoryId || null,
-          priceCents: parseInt(formData.priceCents) * 100,
+          priceCents: Math.round(parseFloat(formData.priceCents) * 100),
           compareAtPriceCents: formData.compareAtPriceCents
-            ? parseInt(formData.compareAtPriceCents) * 100
+            ? Math.round(parseFloat(formData.compareAtPriceCents) * 100)
             : null,
           sku: formData.sku || null,
           stockQuantity: parseInt(formData.stockQuantity),
-          trackInventory: formData.trackInventory,
-          material: formData.material || null,
-          color: formData.color || null,
           isActive: formData.isActive,
           isFeatured: formData.isFeatured,
+          // Extra fields stored in metadata
+          shortDescription: formData.shortDescription || null,
+          material: formData.material || null,
+          color: formData.color || null,
           badge: formData.badge || null,
         }),
       })

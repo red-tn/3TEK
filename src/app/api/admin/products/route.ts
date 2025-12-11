@@ -168,23 +168,31 @@ export async function PUT(req: Request) {
 
     const body = await req.json()
 
-    // Build update object with only provided fields
+    // Build update object with only fields that exist in DB schema
+    // Products table has: name, slug, description, price_cents, compare_at_price_cents,
+    // category_id, images, is_active, is_featured, stock_quantity, sku, weight_grams, dimensions, metadata
     const updateData: Record<string, unknown> = {}
 
     if (body.name !== undefined) updateData.name = body.name
     if (body.slug !== undefined) updateData.slug = body.slug
     if (body.description !== undefined) updateData.description = body.description
-    if (body.shortDescription !== undefined) updateData.short_description = body.shortDescription
     if (body.categoryId !== undefined) updateData.category_id = body.categoryId
     if (body.priceCents !== undefined) updateData.price_cents = body.priceCents
     if (body.compareAtPriceCents !== undefined) updateData.compare_at_price_cents = body.compareAtPriceCents
     if (body.sku !== undefined) updateData.sku = body.sku
     if (body.stockQuantity !== undefined) updateData.stock_quantity = body.stockQuantity
-    if (body.material !== undefined) updateData.material = body.material
-    if (body.color !== undefined) updateData.color = body.color
     if (body.isActive !== undefined) updateData.is_active = body.isActive
     if (body.isFeatured !== undefined) updateData.is_featured = body.isFeatured
-    if (body.badge !== undefined) updateData.badge = body.badge || null
+    if (body.images !== undefined) updateData.images = body.images
+    // Store extra fields in metadata JSON column
+    if (body.shortDescription !== undefined || body.material !== undefined || body.color !== undefined || body.badge !== undefined) {
+      updateData.metadata = {
+        short_description: body.shortDescription || null,
+        material: body.material || null,
+        color: body.color || null,
+        badge: body.badge || null,
+      }
+    }
 
     // Update product in database
     const { data: product, error } = await supabaseAdmin
