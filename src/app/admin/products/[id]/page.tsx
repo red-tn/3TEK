@@ -192,8 +192,9 @@ export default function EditProductPage() {
     )
   }
 
-  const primaryImage =
-    product.images?.find((img) => img.is_primary) || product.images?.[0]
+  // Handle images - could be array of strings or array of objects
+  const getImageUrl = (img: string | { url: string }) =>
+    typeof img === 'string' ? img : img.url
 
   return (
     <div className="space-y-8">
@@ -293,13 +294,13 @@ export default function EditProductPage() {
                       className="relative aspect-square bg-brand-gray clip-corners overflow-hidden group"
                     >
                       <Image
-                        src={image.url}
+                        src={getImageUrl(image)}
                         alt={`Product image ${index + 1}`}
                         fill
                         className="object-cover"
                         sizes="150px"
                       />
-                      {image.is_primary && (
+                      {index === 0 && (
                         <div className="absolute top-2 left-2 bg-brand-neon text-brand-black text-xs px-2 py-1 clip-corners-sm">
                           Primary
                         </div>
@@ -505,16 +506,16 @@ export default function EditProductPage() {
                 Badge
               </h2>
               <Select
-                value={formData.badge}
+                value={formData.badge || 'none'}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, badge: value })
+                  setFormData({ ...formData, badge: value === 'none' ? '' : value })
                 }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="No badge" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   <SelectItem value="new">New</SelectItem>
                   <SelectItem value="popular">Popular</SelectItem>
                   <SelectItem value="sale">Sale</SelectItem>
