@@ -242,11 +242,15 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    // Archive Stripe product if exists
+    // Archive Stripe product if exists (ignore errors if product doesn't exist in Stripe)
     if (product.stripe_product_id) {
-      await stripe.products.update(product.stripe_product_id, {
-        active: false,
-      })
+      try {
+        await stripe.products.update(product.stripe_product_id, {
+          active: false,
+        })
+      } catch (stripeError) {
+        console.log('Stripe product archive skipped:', stripeError)
+      }
     }
 
     if (product.is_active) {
