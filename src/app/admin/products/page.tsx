@@ -162,6 +162,7 @@ export default async function AdminProductsPage() {
                         <DeleteProductButton
                           productId={product.id}
                           productName={product.name}
+                          isActive={product.is_active}
                         />
                       </div>
                     </TableCell>

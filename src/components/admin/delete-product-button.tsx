@@ -9,15 +9,20 @@ import { useToast } from '@/hooks/use-toast'
 interface DeleteProductButtonProps {
   productId: string
   productName: string
+  isActive: boolean
 }
 
-export function DeleteProductButton({ productId, productName }: DeleteProductButtonProps) {
+export function DeleteProductButton({ productId, productName, isActive }: DeleteProductButtonProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
   const { success, error: showError } = useToast()
 
   const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete "${productName}"? This action cannot be undone.`)) {
+    const message = isActive
+      ? `Are you sure you want to deactivate "${productName}"? It will be hidden from the store.`
+      : `Are you sure you want to permanently delete "${productName}"? This action cannot be undone.`
+
+    if (!confirm(message)) {
       return
     }
 
@@ -32,7 +37,14 @@ export function DeleteProductButton({ productId, productName }: DeleteProductBut
         throw new Error('Failed to delete product')
       }
 
-      success('Product deleted', `"${productName}" has been deleted.`)
+      const data = await response.json()
+
+      if (data.action === 'deleted') {
+        success('Product deleted', `"${productName}" has been permanently deleted.`)
+      } else {
+        success('Product deactivated', `"${productName}" has been deactivated.`)
+      }
+
       router.refresh()
     } catch (err) {
       console.error('Delete error:', err)
@@ -48,7 +60,8 @@ export function DeleteProductButton({ productId, productName }: DeleteProductBut
       size="icon"
       onClick={handleDelete}
       disabled={isDeleting}
-      className="text-brand-light-gray hover:text-red-500"
+      className={isActive ? "text-brand-light-gray hover:text-yellow-500" : "text-brand-light-gray hover:text-red-500"}
+      title={isActive ? "Deactivate product" : "Permanently delete product"}
     >
       {isDeleting ? (
         <Loader2 className="h-4 w-4 animate-spin" />

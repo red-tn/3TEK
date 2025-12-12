@@ -231,28 +231,45 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: 'Product ID required' }, { status: 400 })
     }
 
-    // Get product to archive Stripe product
+    // Get product to check status and archive Stripe product
     const { data: product } = await supabaseAdmin
       .from('products')
-      .select('stripe_product_id')
+      .select('stripe_product_id, is_active')
       .eq('id', id)
       .single()
 
-    if (product?.stripe_product_id) {
+    if (!product) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+    }
+
+    // Archive Stripe product if exists
+    if (product.stripe_product_id) {
       await stripe.products.update(product.stripe_product_id, {
         active: false,
       })
     }
 
-    // Soft delete by setting is_active to false
-    const { error } = await supabaseAdmin
-      .from('products')
-      .update({ is_active: false })
-      .eq('id', id)
+    if (product.is_active) {
+      // Product is active - soft delete by setting is_active to false
+      const { error } = await supabaseAdmin
+        .from('products')
+        .update({ is_active: false })
+        .eq('id', id)
 
-    if (error) throw error
+      if (error) throw error
 
-    return NextResponse.json({ success: true })
+      return NextResponse.json({ success: true, action: 'deactivated' })
+    } else {
+      // Product is already inactive - permanently delete
+      const { error } = await supabaseAdmin
+        .from('products')
+        .delete()
+        .eq('id', id)
+
+      if (error) throw error
+
+      return NextResponse.json({ success: true, action: 'deleted' })
+    }
   } catch (error) {
     console.error('Product delete error:', error)
     return NextResponse.json(
