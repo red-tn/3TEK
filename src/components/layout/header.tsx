@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Logo } from '@/components/shared/logo'
 import { Nav } from './nav'
@@ -20,10 +20,15 @@ import {
 import { Menu, ShoppingCart, User, LogOut, Package, Settings, LayoutDashboard } from 'lucide-react'
 
 export function Header() {
+  const [mounted, setMounted] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, profile, isAdmin, isLoading, signOut } = useAuth()
   const { itemCount, openCart } = useCart()
   const cartCount = itemCount()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-brand-gray bg-brand-black/95 backdrop-blur supports-[backdrop-filter]:bg-brand-black/80">
@@ -54,7 +59,7 @@ export function Header() {
               className="relative"
             >
               <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
+              {mounted && cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-brand-neon text-brand-black text-xs font-mono font-bold flex items-center justify-center">
                   {cartCount > 99 ? '99+' : cartCount}
                 </span>
