@@ -218,27 +218,34 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  console.log('DELETE /api/admin/products called')
+
   const auth = await checkAdminAuth()
   if ('error' in auth) {
+    console.log('Auth failed:', auth.error)
     return NextResponse.json({ error: auth.error }, { status: auth.status })
   }
 
   try {
     const { searchParams } = new URL(req.url)
     const id = searchParams.get('id')
+    console.log('Deleting product ID:', id)
 
     if (!id) {
       return NextResponse.json({ error: 'Product ID required' }, { status: 400 })
     }
 
     // Get product to check status and archive Stripe product
-    const { data: product } = await supabaseAdmin
+    const { data: product, error: fetchError } = await supabaseAdmin
       .from('products')
       .select('stripe_product_id, is_active')
       .eq('id', id)
       .single()
 
+    console.log('Product fetch result:', { product, fetchError })
+
     if (!product) {
+      console.log('Product not found for ID:', id)
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
